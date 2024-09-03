@@ -274,7 +274,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Download all artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           path: artifacts
       - name: Create release bundle with archives for all builds
@@ -333,7 +333,7 @@ jobs:
       - name: Install release scripts
         run: nix-env -f default.nix -iA release
       - name: Download Docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: postgrest-docker-x64
       - name: Publish images on Docker Hub

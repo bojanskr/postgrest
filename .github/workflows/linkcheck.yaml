@@ -1,0 +1,17 @@
+name: Linkcheck
+
+on:
+  schedule:
+    - cron: '1 2 * * 3'
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup Nix Environment
+      uses: ./.github/actions/setup-nix
+      with:
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        tools: docs.linkcheck.bin
+    - run: postgrest-docs-linkcheck

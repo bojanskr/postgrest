@@ -33,15 +33,6 @@ postgrest-nixpkgs-upgrade
 
 ```
 
-## Update pinned version of `static-haskell-nix`
-
-We pin [`static-haskell-nix`](https://github.com/nh2/static-haskell-nix) in
-[`nix/static-haskell-package.nix`](static-haskell-package.nix). Upgrade the
-pinned revision and the tarball hash if necessary. See
-[`nix/nixpkgs-upgrade.nix`](nixpkgs-upgrade.nix) for how to get the correct
-tarball hash, or just change the hash to an arbitrary value of correct length,
-run `nix-build` and use the expected value from the resulting error message.
-
 ## Review overlays
 
 Check whether the individual [overlays](overlays) are still required.
@@ -74,7 +65,7 @@ required to avoid build timeouts in CI.
 
 You'll need to set the `CACHIX_SIGNING_KEY` before proceeding, e.g. by creating
 a file containing `export CACHIX_SIGNING_KEY=...` and sourcing that file, which
-avoids having the secret in you shell history.
+avoids having the secret in your shell history.
 
 To push all new artifacts to Cachix, run:
 

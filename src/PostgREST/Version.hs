@@ -1,5 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-type-defaults #-}
+{-# LANGUAGE CPP #-}
 module PostgREST.Version
   ( docsVersion
   , prettyVersion
@@ -7,23 +6,30 @@ module PostgREST.Version
 
 import qualified Data.Text as T
 
-import Data.Version       (versionBranch)
-import Development.GitRev (gitHash)
-import Paths_postgrest    (version)
-
 import Protolude
 
+version :: [Text]
+version = T.splitOn "." VERSION_postgrest
 
--- | User friendly version number
-prettyVersion :: Text
+-- | User friendly version number such as '1.1.1'.
+-- Pre-release versions are tagged as such, e.g., '1.1 (pre-release)'.
+prettyVersion :: ByteString
 prettyVersion =
-  T.intercalate "." (map show $ versionBranch version) <> gitRev
+  VERSION_postgrest <> preRelease
   where
-    gitRev =
-      if $(gitHash) == "UNKNOWN"
-        then mempty
-        else " (" <> T.take 7 $(gitHash) <> ")"
+    preRelease = if isPreRelease then " (pre-release)" else mempty
 
--- | Version number used in docs
+
+-- | Version number used in docs.
+-- Pre-release versions link to the latest docs
+-- Uses only the first component of the version. Example: 'v1'
 docsVersion :: Text
-docsVersion = "v" <> T.dropEnd 1 (T.dropWhileEnd (/= '.') prettyVersion)
+docsVersion
+  | isPreRelease = "latest"
+  | otherwise    =  "v" <> (T.intercalate "." . map show . take 1 $ version)
+
+
+-- | Versions with two components (e.g., '1.1') are treated as pre-releases.
+isPreRelease :: Bool
+isPreRelease =
+  length version == 2

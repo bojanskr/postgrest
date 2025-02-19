@@ -4,30 +4,30 @@ PostgREST ongoing development is only possible thanks to our Sponsors and Backer
 
 ## Sponsors
 
-<table>
+<table align="center">
   <tbody>
     <tr>
       <td align="center" valign="middle">
         <a href="https://www.cybertec-postgresql.com/en/?utm_source=postgrest.org&utm_medium=referral&utm_campaign=postgrest" target="_blank">
-          <img width="222px" src="static/cybertec-new.png">
+          <img width="296px" src="static/cybertec.svg">
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://www.2ndquadrant.com/en/?utm_campaign=External%20Websites&utm_source=PostgREST&utm_medium=Logo" target="_blank">
-          <img width="296px" src="static/2ndquadrant.png">
+        <a href="https://gnuhost.eu/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/gnuhost.png">
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://tryretool.com/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/retool.png">
+        <a href="https://neon.tech/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/neon.jpg">
         </a>
       </td>
     </tr>
     <tr></tr>
     <tr>
       <td align="center" valign="middle">
-        <a href="https://gnuhost.eu/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/gnuhost.png">
+        <a href="https://code.build/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/code-build.png">
         </a>
       </td>
       <td align="center" valign="middle">
@@ -36,8 +36,8 @@ PostgREST ongoing development is only possible thanks to our Sponsors and Backer
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://oblivious.ai/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/oblivious.jpg">
+        <a href="https://tembo.io/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/tembo.png">
         </a>
       </td>
     </tr>
@@ -46,12 +46,14 @@ PostgREST ongoing development is only possible thanks to our Sponsors and Backer
 
 ## Lead Backers
 
+- [Roboflow](https://github.com/roboflow)
 - Evans Fernandes
 - [Jan Sommer](https://github.com/nerfpops)
 - [Franz Gusenbauer](https://www.igutech.at/)
 
 ## Backers
 
+- Zac Miller
 - Tsingson Qin
 - Michel Pelletier
 - Jay Hannah
@@ -74,6 +76,21 @@ PostgREST ongoing development is only possible thanks to our Sponsors and Backer
       <td align="center" valign="middle">
         <a href="https://www.timescale.com?utm_campaign=postgrest&utm_source=sponsor&utm_medium=referral&utm_content=github" target="_blank">
           <img width="222px" src="static/timescaledb.png">
+        </a>
+      </td>
+      <td align="center" valign="middle">
+        <a href="https://tryretool.com/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img max-width="222px" height="88" src="static/retool.png">
+        </a>
+      </td>
+      <td align="center" valign="middle">
+        <a href="https://www.2ndquadrant.com/en/?utm_campaign=External%20Websites&utm_source=PostgREST&utm_medium=Logo" target="_blank">
+          <img width="222px" src="static/2ndquadrant.png">
+        </a>
+      </td>
+      <td align="center" valign="middle">
+        <a href="https://oblivious.ai/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="222px" src="static/oblivious.jpg">
         </a>
       </td>
     </tr>

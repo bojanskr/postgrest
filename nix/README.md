@@ -5,24 +5,14 @@ for developing, testing and building PostgREST.
 
 ## Getting started with Nix
 
-You'll need to [get Nix](https://nixos.org/download.html). The installer will
-create your Nix store in the `/nix/` directory, where all build artifacts and
-their dependencies will be stored. It will also link the Nix executables like
-`nix-env`, `nix-build` and `nix-shell` into your PATH. Nix will manage all
-other PostgREST dependencies from here on out. To clean up older build
-artifacts from the `/nix/store`, you can run `nix-collect-garbage`.
-
-If you are on a system that does not support nix, for example Windows, you can
-run the nix development environment in a docker container. Inside the `nix/`
-directory run `docker-compose run --rm nix` to start the docker container. This
-will set up the binary cache and launch `nix-shell` automatically.
+You'll need to [get Nix](https://nixos.org/download.html). Follow the recommended installation for your operating system from the official download website.
 
 ## Building PostgREST
 
 To build PostgREST from your local checkout of the repository, run:
 
 ```bash
-nix-build --attr postgrestPackage
+$ nix-build --attr postgrestPackage
 
 ```
 
@@ -32,6 +22,15 @@ build the `postgrestPackage` attribute from the Nix expression it finds in our
 `default.nix` (see below for details). Nix will take care of getting the right
 GHC version and all the build dependencies.
 
+You can also build a statically linked binary with:
+
+```bash
+$ nix-build --attr postgrestStatic
+
+$ ldd result/bin/postgrest
+$       not a dynamic executable
+```
+
 ## Binary cache
 
 We recommend that you use the PostgREST binary cache on
@@ -39,10 +38,10 @@ We recommend that you use the PostgREST binary cache on
 
 ```bash
 # Install cachix:
-nix-env -iA cachix -f https://cachix.org/api/v1/install
+$ nix-env -iA cachix -f https://cachix.org/api/v1/install
 
 # Set cachix up to use the PostgREST binary cache:
-cachix use postgrest
+$ cachix use postgrest
 
 ```
 
@@ -56,7 +55,7 @@ following command will put you into a new shell that has GHC and Cabal on the
 PATH:
 
 ```bash
-nix-shell
+$ nix-shell
 
 ```
 
@@ -76,12 +75,12 @@ The PostgREST utilities available in `nix-shell` all have names that begin with
 postgrest-build                   postgrest-test-spec
 postgrest-check                   postgrest-watch
 postgrest-clean                   postgrest-with-all
-postgrest-coverage                postgrest-with-postgresql-10
-postgrest-lint                    postgrest-with-postgresql-11
-postgrest-run                     postgrest-with-postgresql-12
-postgrest-style                   postgrest-with-postgresql-13
-postgrest-style-check             postgrest-with-postgresql-9.5
-postgrest-test-io                 postgrest-with-postgresql-9.6
+postgrest-coverage                postgrest-with-postgresql-12
+postgrest-lint                    postgrest-with-postgresql-13
+postgrest-run                     postgrest-with-postgresql-14
+postgrest-style                   postgrest-with-postgresql-15
+postgrest-style-check             postgrest-with-postgresql-16
+postgrest-test-io                 postgrest-with-postgresql-17
 ...
 
 [nix-shell]$
@@ -92,7 +91,7 @@ Some additional modules like `memory`, `docker` and `release`
 have large dependencies that would need to be built before the shell becomes
 available, which could take an especially long time if the cachix binary cache
 is not used. You can activate those by passing a flag to `nix-shell` with
-`nix-shell --arg <module> true`. This will make the respective utilites available:
+`nix-shell --arg <module> true`. This will make the respective utilities available:
 
 ```bash
 $ nix-shell --arg memory true
@@ -100,12 +99,12 @@ $ nix-shell --arg memory true
 postgrest-build                   postgrest-test-spec
 postgrest-check                   postgrest-watch
 postgrest-clean                   postgrest-with-all
-postgrest-coverage                postgrest-with-postgresql-10
-postgrest-lint                    postgrest-with-postgresql-11
-postgrest-run                     postgrest-with-postgresql-12
-postgrest-style                   postgrest-with-postgresql-13
-postgrest-style-check             postgrest-with-postgresql-9.5
-postgrest-test-io                 postgrest-with-postgresql-9.6
+postgrest-coverage                postgrest-with-postgresql-12
+postgrest-lint                    postgrest-with-postgresql-13
+postgrest-run                     postgrest-with-postgresql-14
+postgrest-style                   postgrest-with-postgresql-15
+postgrest-style-check             postgrest-with-postgresql-16
+postgrest-test-io                 postgrest-with-postgresql-17
 postgrest-test-memory
 ...
 
@@ -114,7 +113,7 @@ postgrest-test-memory
 Note that `postgrest-test-memory` is now also available.
 
 To run one-off commands, you can also use `nix-shell --run <command>`, which
-will lauch the Nix shell, run that one command and exit. Note that the tab
+will launch the Nix shell, run that one command and exit. Note that the tab
 completion will not work with `nix-shell --run`, as Nix has yet to evaluate
 our Nix expressions to see which utilities are available.
 
@@ -146,16 +145,16 @@ Note: Once inside nix-shell, the utilities work from any directory inside
 the PostgREST repo. Paths are resolved relative to the repo root:
 
 ```bash
-$ cd src
+[nix-shell]$ cd src
 # Even though the current directory is ./src, the config path must still start
 # from the repo root:
-$ postgrest-run test/io-tests/configs/simple.conf
+[nix-shell]$ postgrest-run test/io/configs/simple.conf
 ```
 
 ## Testing
 
-In nix-shell, you'll find utility scripts that make it very easy to run the
-Haskell test suite, including setting up all required dependencies and
+In nix-shell, you'll find utility scripts that make it very easy to run our
+test suite, including setting up all required dependencies and
 temporary test databases:
 
 ```bash
@@ -177,12 +176,59 @@ run with `postgrest-test-io`. The test runner under the hood is
 
 ```bash
 # Filter the tests to run by name, including all that contain 'config':
-postgrest-test-io -k config
+[nix-shell]$ postgrest-test-io -k config
 
 # Run tests in parallel using xdist, specifying the number of processes:
-postgrest-test-io -n auto
-postgrest-test-io -n 8
+[nix-shell]$ postgrest-test-io -n auto
+[nix-shell]$ postgrest-test-io -n 8
+```
 
+The memory tests check that we don't surpass a memory threshold for big request bodies.
+
+```bash
+# Build the dependencies needed for the memory test
+$ nix-shell --arg memory true
+
+# Run the memory test
+[nix-shell]$ postgrest-test-memory
+```
+
+The loadtests ensure that performance doesn't drop on a change. Underlyingly they use
+[vegeta](https://github.com/tsenart/vegeta).
+
+```bash
+# Run the loadtests on the latest commit(HEAD)
+[nix-shell]$ postgrest-loadtest
+
+# You can loadtest comparing to a different branch
+[nix-shell]$ postgrest-loadtest-against master
+
+# You can simulate latency client/postgrest and postgrest/database
+[nix-shell]$ PGRST_DELAY=5ms PGDELAY=5ms postgrest-loadtest
+
+# You can build postgrest directly with cabal for faster iteration
+[nix-shell]$ PGRST_BUILD_CABAL=1 postgrest-loadtest
+
+# Produce a markdown report to be used on CI
+[nix-shell]$ postgrest-loadtest-report
+```
+
+doctests for some of our modules are also available:
+
+```bash
+[nix-shell]$ postgrest-test-doctest
+```
+
+## Code coverage
+
+Code coverage is available under the `postgrest-coverage` command. This will produce a `./coverage` directory that can be visualized on a browser.
+
+```bash
+# Will run all the tests and produce a coverage dir
+[nix-shell]$ postgrest-coverage
+...
+
+postgrest-coverage: To see the results, visit file://$(pwd)/coverage/check/hpc_index.html
 ```
 
 ## Linting and styling code
@@ -200,11 +246,32 @@ $ nix-shell --run postgrest-style
 ```
 
 There is also `postgrest-style-check` that exits with a non-zero exit code if
-the check resulted in any uncommited changes. It's mostly useful for CI.
+the check resulted in any uncommitted changes. It's mostly useful for CI.
+
+## Documentation
+
+The following commands can help you when working on the PostgREST docs:
+
+```bash
+# Build the docs
+[nix-shell]$ postgrest-docs-build
+
+# Build the docs and start a livereload server on `http://localhost:5500`
+[nix-shell]$ postgrest-docs-serve
+
+# Run aspell, to verify spelling mistakes
+[nix-shell]$ postgrest-docs-spellcheck
+
+# Detect obsolete entries in postgrest.dict
+[nix-shell]$ postgrest-docs-dictcheck
+
+# Build and run all the validation scripts
+[nix-shell]$ postgrest-docs-check
+```
 
 ## General development tools
 
-Tools like `postgrest-build`, `postgrest-run` etc. are simple wrappers around
+Tools like `postgrest-build`, `postgrest-run`, `postgrest-repl` etc. are simple wrappers around
 `cabal` and should do what you expect. `postgrest-check` runs most checks that will
 also run in CI, with the exception of the IO and Memory checks that need to be run
 separately.
@@ -217,6 +284,72 @@ run against the latest PostgreSQL version by default.
 `postgrest-watch` takes a command as an argument that it will re-run if any source
 file is changed. For example, `postgrest-watch postgrest-with-all postgrest-test-spec`
 will re-run the full spec test suite against all PostgreSQL versions on every change.
+
+## REPL
+
+You can use `postgrest-repl` to manually inspect the PostgREST modules.
+
+```bash
+$ postgrest-repl
+
+ghci> import PostgREST.<tab>
+PostgREST.Admin                        PostgREST.Config.Database              PostgREST.Plan.MutatePlan              PostgREST.Response.OpenAPI
+PostgREST.ApiRequest                   PostgREST.Config.JSPath                PostgREST.Plan.ReadPlan                PostgREST.SchemaCache
+...
+
+ghci> import PostgREST.MediaType
+ghci> decodeMediaType "application/json"
+MTApplicationJSON
+```
+
+## Working with locally modified Haskell packages
+
+Sometimes, we need to modify Haskell libraries in order to debug them or enhance them.
+For example, if you want to debug the [`hasql-pool`](https://hackage.haskell.org/package/hasql-pool)
+library:
+
+First, copy the package to the repo root. We'll use GitHub in this example.
+
+```bash
+$ git clone --depth=1 --branch=0.10.1 https://github.com/nikita-volkov/hasql-pool.git
+$ rm -rf ./hasql-pool/.git
+```
+
+Then, pin the local package to the [`haskell-packages.nix`](./overlays/haskell-packages.nix) file.
+
+```nix
+  overrides =
+    # ...
+    rec {
+
+      # Different subpath may be needed if the cabal file is not in the library's base directory
+      hasql-pool = lib.dontCheck
+        (prev.callCabal2nixWithOptions "hasql-pool" ../../hasql-pool "--subpath=." {} );
+
+    };
+```
+
+Next, both [`cabal.project`](/cabal.project) and [`stack.yaml`](/stack.yaml) need to be updated
+with the local library:
+
+```cabal
+-- cabal.project
+packages:
+  ./hasql-pool/hasql-pool.cabal
+```
+
+```yaml
+# stack.yaml
+extra-deps:
+  - ./hasql-pool/hasql-pool.cabal
+```
+
+Lastly, run `nix-shell` to build the local package. You don't need to exit and
+enter the Nix shell every time you modify the library's code, re-executing
+`postgrest-run` should be enough.
+
+This is done for development purposes only. Local libraries must not be left
+in production ready code.
 
 ## Tour
 
@@ -246,7 +379,7 @@ version.
 ### `shell.nix`
 
 [`shell.nix`](../shell.nix) defines an environment in which PostgREST can be
-built and developed. It extends the build enviroment from our `postgrest`
+built and developed. It extends the build environment from our `postgrest`
 attribute with useful utilities that will be put on the PATH in `nix-shell`.
 
 ### `nix/overlays`

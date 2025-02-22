@@ -1,4 +1,4 @@
-self: super:
+_: super:
 # Overlay that adds the `gitignoreSource` function from Hercules-CI.
 # This function is useful for filtering which files are added to the Nix store.
 # See: https://github.com/hercules-ci/gitignore.nix
@@ -12,8 +12,8 @@ self: super:
       gitignoreSrc = super.fetchFromGitHub {
         owner = "hercules-ci";
         repo = "gitignore";
-        rev = "211907489e9f198594c0eb0ca9256a1949c9d412";
-        sha256 = "06j7wpvj54khw0z10fjyi31kpafkr6hi1k0di13k1xp8kywvfyx8";
+        rev = "a20de23b925fd8264fd7fad6454652e142fd7f73";
+        sha256 = "sha256-8DFJjXG8zqoONA1vXtgeKXy68KdJL5UaXR8NtVMUbx8=";
       };
     in
     (super.callPackage gitignoreSrc { }).gitignoreSource;

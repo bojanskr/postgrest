@@ -1,16 +1,16 @@
-# Creates an environment that exposes bashCompletion arguments from all checkedShellScripts
+# Creates an environment that exposes bash-completion arguments from all checkedShellScripts
 { buildEnv }:
 { name
 , tools
 , extra ? { }
 }:
 let
-  bashCompletion = builtins.map (tool: tool.bashCompletion) tools;
+  bash-completion = builtins.map (tool: (builtins.getAttr tool tools).bash-completion) (builtins.attrNames tools);
 
   env = buildEnv {
     inherit name;
-    paths = builtins.map (tool: tool.bin) tools;
+    paths = builtins.map (tool: (builtins.getAttr tool tools).bin) (builtins.attrNames tools);
   };
 
 in
-env // { inherit bashCompletion; } // extra
+env // tools // { inherit bash-completion; } // extra

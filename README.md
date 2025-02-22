@@ -1,11 +1,6 @@
-![Logo](static/bigger-logo.png "Logo")
+![Logo](static/postgrest.png "Logo")
 
 [![Donate](https://img.shields.io/badge/Donate-Patreon-orange.svg?colorB=F96854)](https://www.patreon.com/postgrest)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/postgrest)
-<a href="https://heroku.com/deploy?template=https://github.com/PostgREST/postgrest">
-  <img src="https://img.shields.io/badge/%E2%86%91_Deploy_to-Heroku-7056bf.svg" alt="Deploy">
-</a>
-[![Join the chat at https://gitter.im/begriffs/postgrest](https://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/begriffs/postgrest)
 [![Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](http://postgrest.org)
 [![Docker Stars](https://img.shields.io/docker/pulls/postgrest/postgrest.svg)](https://hub.docker.com/r/postgrest/postgrest/)
 [![Build Status](https://github.com/postgrest/postgrest/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/PostgREST/postgrest/actions?query=branch%3Amain)
@@ -18,30 +13,30 @@ API than you are likely to write from scratch.
 
 ## Sponsors
 
-<table>
+<table align="center">
   <tbody>
     <tr>
       <td align="center" valign="middle">
         <a href="https://www.cybertec-postgresql.com/en/?utm_source=postgrest.org&utm_medium=referral&utm_campaign=postgrest" target="_blank">
-          <img width="222px" src="static/cybertec-new.png">
+          <img width="296px" src="static/cybertec.svg">
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://www.2ndquadrant.com/en/?utm_campaign=External%20Websites&utm_source=PostgREST&utm_medium=Logo" target="_blank">
-          <img width="296px" src="static/2ndquadrant.png">
+        <a href="https://gnuhost.eu/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/gnuhost.png">
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://tryretool.com/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/retool.png">
+        <a href="https://neon.tech/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/neon.jpg">
         </a>
       </td>
     </tr>
     <tr></tr>
     <tr>
       <td align="center" valign="middle">
-        <a href="https://gnuhost.eu/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/gnuhost.png">
+        <a href="https://code.build/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/code-build.png">
         </a>
       </td>
       <td align="center" valign="middle">
@@ -50,8 +45,8 @@ API than you are likely to write from scratch.
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://oblivious.ai/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
-          <img width="296px" src="static/oblivious.jpg">
+        <a href="https://tembo.io/?utm_source=sponsor&utm_campaign=postgrest" target="_blank">
+          <img width="296px" src="static/tembo.png">
         </a>
       </td>
     </tr>
@@ -71,7 +66,7 @@ Big thanks to our sponsors! You can join them by supporting PostgREST on [Patreo
     ```
 ## [Documentation](http://postgrest.org)
 
-Latest documentation is at [postgrest.org](http://postgrest.org). You can contribute to the docs in [PostgREST/postgrest-docs](https://github.com/PostgREST/postgrest-docs).
+Latest documentation is at [postgrest.org](http://postgrest.org). You can contribute to the docs in [PostgREST/postgrest/docs](https://github.com/PostgREST/postgrest/tree/main/docs).
 
 ## Performance
 
@@ -112,15 +107,6 @@ the connection cannot do anything the user themselves couldn't. Other
 forms of authentication can be built on top of the JWT primitive. See
 the docs for more information.
 
-Since PostgreSQL 9.5 supports true [row-level
-security](http://www.postgresql.org/docs/9.5/static/ddl-rowsecurity.html).
-In previous versions it can be simulated with triggers and
-security-barrier views. Because the possible queries to the database
-are limited to certain templates using
-[leakproof](http://blog.2ndquadrant.com/how-do-postgresql-security_barrier-views-work/)
-functions, the trigger workaround does not compromise row-level
-security.
-
 ## Versioning
 
 A robust long-lived API needs the freedom to exist in multiple
@@ -157,11 +143,7 @@ and the [API guide](http://postgrest.org/en/stable/api.html).
 
 ## Supporting development
 
-You can help PostgREST ongoing maintenance and development by:
-
-- Making a regular donation through Patreon https://www.patreon.com/postgrest
-
-- Alternatively, you can make a one-time donation via Paypal https://www.paypal.me/postgrest
+You can help PostgREST ongoing maintenance and development by making a regular donation through Patreon https://www.patreon.com/postgrest
 
 Every donation will be spent on making PostgREST better for the whole community.
 

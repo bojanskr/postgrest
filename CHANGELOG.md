@@ -7,7 +7,579 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+ - #3558, Add the `admin-server-host` config to set the host for the admin server - @develop7
+ - #3607, Log to stderr when the JWT secret is less than 32 characters long - @laurenceisla
+ - #2858, Performance improvements when calling RPCs via GET using indexes in more cases - @wolfgangwalther
+ - #3560, Log resolved host in "Listening on ..." messages - @develop7
+ - #3727, Log maximum pool size - @steve-chavez
+ - #1536, Add string comparison feature for jwt-role-claim-key - @taimoorzaeem
+ - #3747, Allow `not_null` value for the `is` operator - @taimoorzaeem
+ - #2255, Apply `to_tsvector()` explicitly to the full-text search filtered column (excluding `tsvector` types) - @laurenceisla
+ - #1578, Log the main SQL query to stderr at the current `log-level` when `log-query=main-query` - @laurenceisla
+
 ### Fixed
+
+ - #3693, Prevent spread embedding to allow aggregates when they are disabled - @laurenceisla
+ - #3693, A nested spread embedding now correctly groups by the fields of its top parent relationship - @laurenceisla
+ - #3693, Fix spread embedding errors when using the `count()` aggregate without a field - @laurenceisla
+   + Fixed `"column reference <col> is ambiguous"` error when selecting `?select=...table(col,count())`
+   + Fixed `"column <json_aggregate>.<alias> does not exist"` error when selecting `?select=...table(aias:count())`
+ - #3727, Clarify "listening" logs - @steve-chavez
+ - #3795, Clarify `Accept: vnd.pgrst.object` error message - @steve-chavez
+ - #3697, #3602, Handle queries on non-existing table gracefully - @taimoorzaeem
+
+### Changed
+
+ - #2052, Dropped support for PostgreSQL 9.6 - @wolfgangwalther
+ - #2052, Dropped support for PostgreSQL 10 - @wolfgangwalther
+ - #2052, Dropped support for PostgreSQL 11 - @wolfgangwalther
+ - #3508, PostgREST now fails to start when `server-port` and `admin-server-port` config options are the same - @develop7
+ - #3607, PostgREST now fails to start when the JWT secret is less than 32 characters long - @laurenceisla
+ - #3644, Fail schema cache lookup with invalid db-schemas config - @wolfgangwalther
+   - Previously, this would silently return 200 - OK on the root endpoint, but don't provide any usable endpoints.
+ - #3757, Remove support for `Prefer: params=single-object` - @joelonsql
+   + This preference was deprecated in favor of Functions with an array of JSON objects
+ - #3013, Drop support for Limited updates/deletes
+   + The feature was complicated and largely unused.
+ - #3697, #3602, Querying non-existent table now returns `PGRST205` error instead of empty json - @taimoorzaeem
+
+## [12.2.8] - 2025-02-10
+
+### Fixed
+
+ - #3841, Log `503` client error to stderr - @taimoorzaeem
+
+## [12.2.7] - 2025-02-03
+
+### Fixed
+
+ - #2524, Fix schema reloading notice on windows - @diogob
+
+## [12.2.6] - 2025-01-29
+
+### Fixed
+
+ - #3788, Fix jwt cache does not remove expired entries - @taimoorzaeem
+
+## [12.2.5] - 2025-01-20
+
+### Fixed
+
+ - #3867, Fix startup for arm64 docker image - @wolfgangwalther
+
+## [12.2.4] - 2025-01-18
+
+### Fixed
+
+ - #3779, Always log the schema cache load time - @steve-chavez
+ - #3706, Fix insert with `missing=default` uses default value of domain instead of column - @taimoorzaeem
+
+## [12.2.3] - 2024-08-01
+
+### Fixed
+
+ - #3091, Broken link in OpenAPI description `externalDocs` - @salim-b
+ - #3659, Embed One-to-One relationship with different column order properly - @wolfgangwalther
+ - #3504, Remove `format` from `rowFilter` parameters in OpenAPI - @dantheman2865
+ - #3660, Fix regression that loaded the schema cache before the in-database configuration - @steve-chavez, @laurenceisla
+
+## [12.2.2] - 2024-07-10
+
+### Fixed
+
+ - #3093, Nested empty embeds no longer show empty values and are correctly omitted - @laurenceisla
+ - #3644, Make --dump-schema work with in-database pgrst.db_schemas setting - @wolfgangwalther
+ - #3644, Show number of timezones in schema cache load report - @wolfgangwalther
+ - #3644, List correct enum options in OpenApi output when multiple types with same name are present - @wolfgangwalther
+ - #3523, Fix schema cache loading retry without backoff - @steve-chavez
+
+## [12.2.1] - 2024-06-27
+
+### Fixed
+
+ - #3147, Don't reload schema cache on every listener failure - @steve-chavez
+
+### Documentation
+
+ - #3592, Architecture diagram now supports dark mode and has links - @laurenceisla
+ - #3616, The schema isolation diagram now supports dark mode and uses well-known schemas - @laurenceisla
+
+## [12.2.0] - 2024-06-11
+
+### Added
+
+ - #2887, Add Preference `max-affected` to limit affected resources - @taimoorzaeem
+ - #3171, Add an ability to dump config via admin API - @skywriter
+ - #3171, #3046, Log schema cache stats to stderr - @steve-chavez
+ - #3210, Dump schema cache through admin API - @taimoorzaeem
+ - #2676, Performance improvement on bulk json inserts, around 10% increase on requests per second by removing `json_typeof` from write queries - @steve-chavez
+ - #3435, Add log-level=debug, for development purposes - @steve-chavez
+ - #1526, Add `/metrics` endpoint on admin server - @steve-chavez
+   - Exposes connection pool metrics, schema cache metrics
+ - #3404, Show the failed MESSAGE or DETAIL in the `details` field of the `PGRST121` (could not parse RAISE 'PGRST') error - @laurenceisla
+ - #3404, Show extra information in the `PGRST121` (could not parse RAISE 'PGRST') error - @laurenceisla
+   + Shows the failed MESSAGE or DETAIL in the `details` field
+   + Shows the correct JSON format in the `hints` field
+ - #3340, Log when the LISTEN channel gets a notification - @steve-chavez
+ - #3184, Log full pg version to stderr on connection - @steve-chavez
+ - #3242. Add config `db-hoisted-tx-settings` to apply only hoisted function settings - @taimoorzaeem
+ - #3214, #3229 Log connection pool events on log-level=debug - @steve-chavez, @laurenceisla
+
+### Fixed
+
+ - #3237, Dump media handlers and timezones with --dump-schema - @wolfgangwalther
+ - #3323, #3324, Don't hide error on LISTEN channel failure - @steve-chavez
+ - #3330, Incorrect admin server `/ready` response on slow schema cache loads - @steve-chavez
+ - #3345, Fix in-database configuration values not loading for `pgrst.server_trace_header` and `pgrst.server_cors_allowed_origins` - @laurenceisla
+ - #3404, Clarify the `PGRST121` (could not parse RAISE 'PGRST') error message - @laurenceisla
+ - #3267, Fix wrong `503 Service Unavailable` on pg error `53400` - @taimoorzaeem
+ - #2985, Fix not adding `application_name` on all connection strings - @steve-chavez
+ - #3424, Admin `/live` and `/ready` now differentiates a failure as 500 status - @steve-chavez
+    + 503 status is still given when postgREST is in a recovering state
+ - #3478, Media Types are parsed case insensitively - @develop7
+ - #3533, #3536, Fix listener silently failing on read replica - @steve-chavez
+    + If the LISTEN connection fails, it's retried with exponential backoff
+ - #3414, Force listener to connect to read-write instances using `target_session_attrs` - @steve-chavez
+ - #3255, Fix incorrect `413 Request Entity Too Large` on pg errors `54*` - @taimoorzaeem
+ - #3549, Remove verbosity from error logs starting with "An error occurred..." and replacing it with "Failed to..." - @laurenceisla
+
+### Deprecated
+
+ - Support for PostgreSQL versions 9.6, 10 and 11 is deprecated. From this on version onwards, PostgREST will only support non-end-of-life PostgreSQL versions. See https://www.postgresql.org/support/versioning/.
+ - `Prefer: params=single-object` is deprecated. Use [a function with a single unnamed JSON parameter](https://postgrest.org/en/latest/references/api/functions.html#function-single-json) instead. - @steve-chavez
+
+### Documentation
+
+ - #3289, Add dark mode. Can be toggled by a button in the bottom right corner. - @laurenceisla
+ - #3384, Add architecture diagram and documentation - @steve-chavez
+
+## [12.0.3] - 2024-05-09
+
+### Fixed
+
+ - #3149, Misleading "Starting PostgREST.." logs on schema cache reloading - @steve-chavez
+ - #3205, Fix wrong subquery error returning a status of 400 Bad Request - @steve-chavez
+ - #3224, Return status code 406 for non-accepted media type instead of code 415 - @wolfgangwalther
+ - #3160, Fix using select= query parameter for custom media type handlers - @wolfgangwalther
+ - #3361, Clarify PGRST204(column not found) error message - @steve-chavez
+ - #3373, Remove rejected mediatype `application/vnd.pgrst.object+json` from response - @taimoorzaeem
+ - #3418, Fix OpenAPI not tagging a FK column correctly on O2O relationships - @laurenceisla
+ - #3256, Fix wrong http status for pg error `42P17 infinite recursion` - @taimoorzaeem
+
+## [12.0.2] - 2023-12-20
+
+### Fixed
+
+  - #3124, Fix table's media type handlers not working for all schemas - @steve-chavez
+  - #3126, Fix empty row on media type handler function - @steve-chavez
+
+## [12.0.1] - 2023-12-12
+
+### Fixed
+
+ - #3054, Fix not allowing special characters in JSON keys - @laurenceisla
+ - #2344, Replace JSON parser error with a clearer generic message - @develop7
+ - #3100, Add missing in-database configuration option for `jwt-cache-max-lifetime` - @laurenceisla
+ - #3089, The any media type handler now sets `Content-Type: application/octet-stream` by default instead of `Content-Type: application/json` - @steve-chavez
+
+## [12.0.0] - 2023-12-01
+
+### Added
+
+ - #1614, Add `db-pool-automatic-recovery` configuration to disable connection retrying - @taimoorzaeem
+ - #2492, Allow full response control when raising exceptions - @taimoorzaeem, @laurenceisla
+ - #2771, #2983, #3062, #3055 Add `Server-Timing` response header - @taimoorzaeem, @develop7, @laurenceisla
+ - #2698, Add config `jwt-cache-max-lifetime` and implement JWT caching - @taimoorzaeem
+ - #2943, Add `handling=strict/lenient` for Prefer header - @taimoorzaeem
+ - #2441, Add config `server-cors-allowed-origins` to specify CORS origins - @taimoorzaeem
+ - #2825, SQL handlers for custom media types - @steve-chavez
+   + Solves #1548, #2699, #2763, #2170, #1462, #1102, #1374, #2901
+ - #2799, Add timezone in Prefer header - @taimoorzaeem
+ - #3001, Add `statement_timeout` set on functions - @taimoorzaeem
+ - #3045, Apply superuser settings on impersonated roles if they have PostgreSQL 15 `GRANT SET ON PARAMETER` privilege - @steve-chavez
+ - #915, Add support for aggregate functions - @timabdulla
+    + The aggregate functions SUM(), MAX(), MIN(), AVG(), and COUNT() are now supported.
+    + It's disabled by default, you can enable it with `db-aggregates-enabled`.
+ - #3057, Log all internal database errors to stderr - @laurenceisla
+
+### Fixed
+
+ - #3015, Fix unnecessary count() on RPC returning single - @steve-chavez
+ - #1070, Fix HTTP status responses for upserts - @taimoorzaeem
+   + `PUT` returns `201` instead of `200` when rows are inserted
+   + `POST` with `Prefer: resolution=merge-duplicates` returns `200` instead of `201` when no rows are inserted
+ - #3019, Transaction-Scoped Settings are now shown clearly in the Postgres logs - @laurenceisla
+   + Shows `set_config('pgrst.setting_name', $1)` instead of `setconfig($1, $2)`
+   + Does not apply to role settings and `app.settings.*`
+ - #2420, Fix bogus message when listening on port 0 - @develop7
+ - #3067, Fix Acquision Timeout errors logging to stderr when `log-level=crit` - @laurenceisla
+
+### Changed
+
+ - Removed [raw-media-types config](https://postgrest.org/en/v11.1/references/configuration.html#raw-media-types) - @steve-chavez
+ - Removed `application/octet-stream`, `text/plain`, `text/xml` [builtin support for scalar results](https://postgrest.org/en/v11.1/references/api/resource_representation.html#scalar-function-response-format) - @steve-chavez
+ - Removed default `application/openapi+json` media type for [db-root-spec](https://postgrest.org/en/v11.1/references/configuration.html#db-root-spec) - @steve-chavez
+ - Removed [db-use-legacy-gucs](https://postgrest.org/en/v11.2/references/configuration.html#db-use-legacy-gucs) - @laurenceisla
+   + All PostgreSQL versions now use GUCs in JSON format for [Headers, Cookies and JWT claims](https://postgrest.org/en/v12/references/transactions.html#request-headers-cookies-and-jwt-claims).
+
+## [11.2.2] - 2023-10-25
+
+### Fixed
+
+ - #2824, Fix regression by reverting fix that returned 206 when first position = length in a `Range` header - @laurenceisla, @strengthless
+
+## [11.2.1] - 2023-10-03
+
+### Fixed
+
+ - #2899, Fix `application/vnd.pgrst.array` not accepted as a valid mediatype - @taimoorzaeem
+ - #2524, Fix schema cache and configuration reloading with `NOTIFY` not working on Windows - @diogob, @laurenceisla
+ - #2915, Fix duplicate headers in response - @taimoorzaeem
+ - #2824, Fix range request with first position same as length return status 206 - @taimoorzaeem
+ - #2939, Fix wrong `Preference-Applied` with `Prefer: tx=commit` when transaction is rollbacked - @steve-chavez
+ - #2939, Fix `count=exact` not being included in `Preference-Applied` - @steve-chavez
+ - #2800, Fix not including to-one embed resources that had a `NULL` value in any of the selected fields when doing null filtering on them - @laurenceisla
+ - #2846, Fix error when requesting `Prefer: count=<type>` and doing null filtering on embedded resources - @laurenceisla
+ - #2959, Fix setting `default_transaction_isolation` unnecessarily - @steve-chavez
+ - #2929, Fix arrow filtering on RPC returning dynamic TABLE with composite type - @steve-chavez
+ - #2963, Fix RPCs not embedding correctly when using overloaded functions for computed relationships - @laurenceisla
+ - #2970, Fix regression that rejects URI connection strings with certain unescaped characters in the password - @laurenceisla, @steve-chavez
+
+## [11.2.0] - 2023-08-10
+
+### Added
+
+ - #2523, Data representations - @aljungberg
+   + Allows for flexible API output formatting and input parsing on a per-column type basis using regular SQL functions configured in the database
+   + Enables greater flexibility in the form and shape of your APIs, both for output and input, making PostgREST a more versatile general-purpose API server
+   + Examples include base64 encode/decode your binary data (like a `bytea` column containing an image), choose whether to present a timestamp column as seconds since the Unix epoch or as an ISO 8601 string, or represent fixed precision decimals as strings, not doubles, to preserve precision
+   + ...and accept the same in `POST/PUT/PATCH` by configuring the reverse transformation(s)
+   + Other use-cases include custom representation of enums, arrays, nested objects, CSS hex colour strings, gzip compressed fields, metric to imperial conversions, and much more
+   + Works when using the `select` parameter to select only a subset of columns, embedding through complex joins, renaming fields, with views and computed columns
+   + Works when filtering on a formatted column without extra indexes by parsing to the canonical representation
+   + Works for data `RETURNING` operations, such as requesting the full body in a POST/PUT/PATCH with `Prefer: return=representation`
+   + Works for batch updates and inserts
+   + Completely optional, define the functions in the database and they will be used automatically everywhere
+   + Data representations preserve the ability to write to the original column and require no extra storage or complex triggers (compared to using `GENERATED ALWAYS` columns)
+   + Note: data representations require Postgres 10 (Postgres 11 if using `IN` predicates); data representations are not implemented for RPC
+ - #2647, Allow to verify the PostgREST version in SQL: `select distinct application_name from pg_stat_activity`. - @laurenceisla
+ - #2856, Add the `--version` CLI option that prints the version information - @laurenceisla
+ - #1655, Improve `details` field of the singular error response - @taimoorzaeem
+ - #740, Add `Preference-Applied` in response for `Prefer: return=representation/headers-only/minimal` - @taimoorzaeem
+ - #1601, Add optional `nulls=stripped` parameter for mediatypes `application/vnd.pgrst.array+json` and `application/vnd.pgrst.object+json` - @taimoorzaeem
+
+### Fixed
+
+ - #2821, Fix OPTIONS not accepting all available media types - @steve-chavez
+ - #2834, Fix compilation on Ubuntu by being compatible with GHC 9.0.2 - @steve-chavez
+ - #2840, Fix `Prefer: missing=default` with DOMAIN default values - @steve-chavez
+ - #2849, Fix HEAD unnecessarily executing aggregates - @steve-chavez
+ - #2594, Fix unused index on jsonb/jsonb arrow filter and order (``/bets?data->>contractId=eq.1`` and ``/bets?order=data->>contractId``) - @steve-chavez
+ - #2861, Fix character and bit columns with fixed length not inserting/updating properly - @laurenceisla
+   + Fixes the error "value too long for type character(1)" when the char length of the column was bigger than one.
+ - #2862, Fix null filtering on embedded resource when using a column name equal to the relation name - @steve-chavez
+ - #1586, Fix function parameters of type character and bit not ignoring length - @laurenceisla
+   + Fixes the error "value too long for type character(1)" when the char length of the parameter was bigger than one.
+ - #2881, Fix error when a function returns `RECORD` or `SET OF RECORD` - @laurenceisla
+ - #2896, Fix applying superuser settings for impersonated role - @steve-chavez
+
+### Deprecated
+
+ - #2863, Deprecate resource embedding target disambiguation - @steve-chavez
+   + The `/table?select=*,other!fk(*)` must be used to disambiguate
+   + The server aids in choosing the `!fk` by sending a `hint` on the error whenever an ambiguous request happens.
+
+## [11.1.0] - 2023-06-07
+
+### Added
+
+ - #2786, Limit idle postgresql connection lifetime - @robx
+   + New option `db-pool-max-idletime` (default 30s).
+   + This is equivalent to the old option `db-pool-timeout` of PostgREST 10.0.0.
+   + A config alias for `db-pool-timeout` is included.
+ - #2703, Add pre-config function - @steve-chavez
+    + New config option `db-pre-config`(empty by default)
+    + Allows using the in-database configuration without SUPERUSER
+ - #2781, When `db-channel-enabled` is false, start automatic connection recovery on a new request when pool connections are closed with `pg_terminate_backend` - @steve-chavez
+    + Mitigates the lack of LISTEN/NOTIFY for schema cache reloading on read replicas.
+
+### Fixed
+
+ - #2791, Fix dropping schema cache reload notifications  - @steve-chavez
+ - #2801, Stop retrying connection when "no password supplied" - @steve-chavez
+
+## [11.0.1] - 2023-04-27
+
+### Fixed
+
+ - #2762, Fixes "permission denied for schema" error during schema cache load - @steve-chavez
+ - #2756, Fix bad error message on generated columns when using `Prefer: missing=default` - @steve-chavez
+ - #1139, Allow a 30 second skew for JWT validation - @steve-chavez
+   + It used to be 1 second, which was too strict
+
+## [11.0.0] - 2023-04-16
+
+### Added
+
+ - #1414, Add related orders - @steve-chavez
+   + On a many-to-one or one-to-one relationship, you can order a parent by a child column `/projects?select=*,clients(*)&order=clients(name).desc.nullsfirst`
+ - #1233, #1907, #2566, Allow spreading embedded resources - @steve-chavez
+   + On a many-to-one or one-to-one relationship, you can unnest a json object with `/projects?select=*,...clients(client_name:name)`
+   + Allows including the join table columns when resource embedding
+   + Allows disambiguating a recursive m2m embed
+   + Allows disambiguating an embed that has a many-to-many relationship using two foreign keys on a junction
+ - #2340, Allow embedding without selecting any column - @steve-chavez
+ - #2563, Allow `is.null` or `not.is.null` on an embedded resource - @steve-chavez
+   + Offers a more flexible replacement for `!inner`, e.g. `/projects?select=*,clients(*)&clients=not.is.null`
+   + Allows doing an anti join, e.g. `/projects?select=*,clients(*)&clients=is.null`
+   + Allows using or across related tables conditions
+ - #1100, Customizable OpenAPI title - @AnthonyFisi
+ - #2506, Add `server-trace-header` for tracing HTTP requests.  - @steve-chavez
+   + When the client sends the request header specified in the config it will be included in the response headers.
+ - #2694, Make `db-root-spec` stable. - @steve-chavez
+   + This can be used to override the OpenAPI spec with a custom database function
+ - #1567, On bulk inserts, missing values can get the column DEFAULT by using the `Prefer: missing=default` header - @steve-chavez
+ - #2501, Allow filtering by`IS DISTINCT FROM` using the `isdistinct` operator, e.g. `/people?alias=isdistinct.foo`
+ - #1569, Allow `any/all` modifiers on the `eq,like,ilike,gt,gte,lt,lte,match,imatch` operators, e.g. `/tbl?id=eq(any).{1,2,3}` - @steve-chavez
+   - This converts the input into an array type
+ - #2561, Configurable role settings - @steve-chavez
+   - Database roles that are members of the connection role get their settings applied, e.g. doing
+     `ALTER ROLE anon SET statement_timeout TO '5s'` will result in that `statement_timeout` getting applied for that role.
+   - Works when switching roles when a JWT is sent
+   - Settings can be reloaded with `NOTIFY pgrst, 'reload config'`.
+ - #2468, Configurable transaction isolation level with `default_transaction_isolation` - @steve-chavez
+   - Can be set per function `create function .. set default_transaction_isolation = 'repeatable read'`
+   - Or per role `alter role .. set default_transaction_isolation = 'serializable'`
+
+### Fixed
+
+ - #2651, Add the missing `get` path item for RPCs to the OpenAPI output - @laurenceisla
+ - #2648, Fix inaccurate error codes with new ones - @laurenceisla
+   + `PGRST204`: Column is not found
+   + `PGRST003`: Timed out when acquiring connection to db
+ - #1652, Fix function call with arguments not inlining - @steve-chavez
+ - #2705, Fix bug when using the `Range` header on `PATCH/DELETE` - @laurenceisla
+   + Fix the`"message": "syntax error at or near \"RETURNING\""` error
+   + Fix doing a limited update/delete when an `order` query parameter was present
+ - #2742, Fix db settings and pg version queries not getting prepared  - @steve-chavez
+ - #2618, Fix `PATCH` requests not recognizing embedded filters and using the top-level resource instead - @steve-chavez
+
+### Changed
+
+ - #2705, The `Range` header is now only considered on `GET` requests and is ignored for any other method - @laurenceisla
+   + Other methods should use the `limit/offset` query parameters for sub-ranges
+   + `PUT` requests no longer return an error when this header is present (using `limit/offset` still triggers the error)
+ - #2733, Remove bulk RPC call with the `Prefer: params=multiple-objects` header. A function with a JSON array or object parameter should be used instead.
+
+## [10.2.0] - 2023-04-12
+
+### Added
+
+ - #2663, Limit maximal postgresql connection lifetime - @robx
+   + New option `db-pool-max-lifetime` (default 30m)
+   + `db-pool-acquisition-timeout` is no longer optional and defaults to 10s
+   + Fixes postgresql resource leak with long-lived connections (#2638)
+
+### Fixed
+
+ - #2667, Fix `db-pool-acquisition-timeout` not logging to stderr when the timeout is reached - @steve-chavez
+
+## [10.1.2] - 2023-02-01
+
+### Fixed
+
+ - #2565, Fix bad M2M embedding on RPC - @steve-chavez
+ - #2575, Replace misleading error message when no function is found with a hint containing functions/parameters names suggestions - @laurenceisla
+ - #2582, Move explanation about "single parameters" from the `message` to the `details` in the error output - @laurenceisla
+ - #2569, Replace misleading error message when no relationship is found with a hint containing parent/child names suggestions - @laurenceisla
+ - #1405, Add the required OpenAPI items object when the parameter is an array - @laurenceisla
+ - #2592, Add upsert headers for POST requests to the OpenAPI output - @laurenceisla
+ - #2623, Fix FK pointing to VIEW instead of TABLE in OpenAPI output - @laurenceisla
+ - #2622, Consider any PostgreSQL authentication failure as fatal and exit immediately - @michivi
+ - #2620, Fix `NOTIFY pgrst` not reloading the db connections catalog cache - @steve-chavez
+
+## [10.1.1] - 2022-11-08
+
+### Fixed
+
+ - #2548, Fix regression when embedding views with partial references to multi column FKs - @wolfgangwalther
+ - #2558, Fix regression when requesting limit=0 and `db-max-row` is set - @laurenceisla
+ - #2542, Return a clear error without hitting the database when trying to update or insert an unknown column with `?columns` - @aljungberg
+
+## [10.1.0] - 2022-10-28
+
+### Added
+
+ - #2348, Add `db-pool-acquisition-timeout` configuration option, time in seconds to wait to acquire a connection. - @robx
+
+### Fixed
+
+ - #2261, #2349, #2467, Reduce allocations communication with PostgreSQL, particularly for request bodies. - @robx
+ - #2401, #2444, Fix SIGUSR1 to fully flush connections pool. - @robx
+ - #2428, Fix opening an empty transaction on failed resource embedding - @steve-chavez
+ - #2455, Fix embedding the same table multiple times - @steve-chavez
+ - #2518, Fix a regression when embedding views where base tables have a different column order for FK columns - @wolfgangwalther
+ - #2458, Fix a regression with the location header when inserting into views with PKs from multiple tables - @wolfgangwalther
+ - #2356, Fix a regression in openapi output with mode follow-privileges - @wolfgangwalther
+ - #2283, Fix infinite recursion when loading schema cache with self-referencing view - @wolfgangwalther
+ - #2343, Return status code 200 for PATCH requests which don't affect any rows - @wolfgangwalther
+ - #2481, Treat computed relationships not marked SETOF as M2O/O2O relationship - @wolfgangwalther
+ - #2534, Fix embedding a computed relationship with a normal relationship - @steve-chavez
+ - #2362, Fix error message when [] is used inside select - @wolfgangwalther
+ - #2475, Disallow !inner on computed columns - @wolfgangwalther
+ - #2285, Ignore leading and trailing spaces in column names when parsing the query string - @wolfgangwalther
+ - #2545, Fix UPSERT with PostgreSQL 15 - @wolfgangwalther
+ - #2459, Fix embedding views with multiple references to the same base column - @wolfgangwalther
+
+### Changed
+
+ - #2444, Removed `db-pool-timeout` option, because this was removed upstream in hasql-pool. - @robx
+ - #2343, PATCH requests that don't affect any rows no longer return 404 - @wolfgangwalther
+ - #2537, Stricter parsing of query string. Instead of silently ignoring, the parser now throws on invalid syntax like json paths for embeddings, hints for regular columns, empty casts or fts languages, etc. - @wolfgangwalther
+
+### Deprecated
+
+ - #1385, Deprecate bulk-calls when including the `Prefer: params=multiple-objects` in the request. A function with a JSON array or object parameter should be used instead for a better performance.
+
+## [10.0.0] - 2022-08-18
+
+### Added
+
+ - #1933, #2109, Add a minimal health check endpoint - @steve-chavez
+   + For enabling this, the `admin-server-port` config must be set explictly
+   + A `<host>:<admin_server_port>/live` endpoint is available for checking if postgrest is running on its port/socket. 200 OK = alive, 503 = dead.
+   + A `<host>:<admin_server_port>/ready` endpoint is available for checking a correct internal state(the database connection plus the schema cache). 200 OK = ready, 503 = not ready.
+ - #1988, Add the current user to the request log on stdout - @DavidLindbom, @wolfgangwalther
+ - #1823, Add the ability to run postgrest without any configuration. - @wolfgangwalther
+   + #1991, Add the ability to run without `db-uri` using libpq's PG environment variables to connect. - @wolfgangwalther
+   + #1769, Add the ability to run without `db-schemas`, defaulting to `db-schemas=public`. - @wolfgangwalther
+   + #1689, Add the ability to run without `db-anon-role` disabling anonymous access. - @wolfgangwalther
+ - #1543, Allow access to fields of composite types in select=, order= and filters through JSON operators -> and ->>. - @wolfgangwalther
+ - #2075, Allow access to array items in ?select=, ?order= and filters through JSON operators -> and ->>. - @wolfgangwalther
+ - #2156, #2211, Allow applying `limit/offset` to UPDATE/DELETE to only affect a subset of rows - @steve-chavez
+   + It requires an explicit `order` on a unique column(s)
+ - #1917, Add error codes with the `"PGRST"` prefix to the error response body to differentiate PostgREST errors from PostgreSQL errors - @laurenceisla
+ - #1917, Normalize the error response body by always having the `detail` and `hint` error fields with a `null` value if they are empty - @laurenceisla
+ - #2176, Errors raised with `SQLSTATE` now include the message and the code in the response body - @laurenceisla
+ - #2236, Support POSIX regular expression operators for row filtering - @enote-kane
+ - #2202, Allow returning XML from RPCs - @fjf2002
+ - #2268, Allow returning XML from single-column queries - @fjf2002
+ - #2300, RPC POST for function w/single unnamed XML param #2300 - @fjf2002
+ - #1564, Allow geojson output by specifying the `Accept: application/geo+json` media type - @steve-chavez
+   + Requires postgis >= 3.0
+   + Works for GET, RPC, POST/PATCH/DELETE with `Prefer: return=representation`.
+   + Resource embedding works and the embedded rows will go into the `properties` key
+   + In case of multiple geometries in the same table, you can choose which one will go into the `geometry` key with the usual `?select` query parameter.
+ - #1082, Add security definitions to the OpenAPI output - @laurenceisla
+ - #2378, Support http OPTIONS method on RPC and root path - @steve-chavez
+ - #2354, Allow getting the EXPLAIN plan of a request by using the `Accept: application/vnd.pgrst.plan` header - @steve-chavez
+   + Only allowed if the `db-plan-enabled` config is set to true
+   + Can generate the plan for different media types using the `for` parameter: `Accept: application/vnd.pgrst.plan; for="application/vnd.pgrst.object"`
+   + Different options for the plan can be used with the `options` parameter: `Accept: application/vnd.pgrst.plan; options=analyze|verbose|settings|buffers|wal`
+   + The plan can be obtained in text or json by using different media type suffixes: `Accept: application/vnd.pgrst.plan+text` and `Accept: application/vnd.pgrst.plan+json`.
+ - #2144, Support computed relationships which allow extending and overriding relationships for resource embedding - @steve-chavez, @wolfgangwalther
+ - #1984, Detect one-to-one relationships for resource embedding - @steve-chavez
+   + Detected when there's a foreign key with a unique constraint or when a foreign key is also a primary key
+
+### Fixed
+
+ - #2058, Return 204 No Content without Content-Type for PUT - @wolfgangwalther
+ - #2107, Clarify error for failed schema cache load. - @steve-chavez
+   + From `Database connection lost. Retrying the connection` to `Could not query the database for the schema cache. Retrying.`
+ - #1771, Fix silently ignoring filter on a non-existent embedded resource - @steve-chavez
+ - #2152, Remove functions, which are uncallable because of unnamend arguments from schema cache and OpenAPI output. - @wolfgangwalther
+ - #2145, Fix accessing json array fields with -> and ->> in ?select= and ?order=. - @wolfgangwalther
+ - #2155, Ignore `max-rows` on POST, PATCH, PUT and DELETE - @steve-chavez
+ - #2254, Fix inferring a foreign key column as a primary key column on views - @steve-chavez
+ - #2070, Restrict generated many-to-many relationships - @steve-chavez
+   + Only adds many-to-many relationships when: a table has FKs to two other tables and these FK columns are part of the table's PK columns.
+ - #2278, Allow casting to types with underscores and numbers(e.g. `select=oid_array::_int4`) - @steve-chavez
+ - #2277, #2238, #1643, Prevent views from breaking one-to-many/many-to-one embeds when using column or FK as target - @steve-chavez
+    + When using a column or FK as target for embedding(`/tbl?select=*,col-or-fk(*)`), only tables are now detected and views are not.
+    + You can still use a column or an inferred FK on a view to embed a table(`/view?select=*,col-or-fk(*)`)
+ - #2317, Increase the `db-pool-timeout` to 1 hour to prevent frequent high connection latency - @steve-chavez
+ - #2341, The search path now correctly identifies schemas with uppercase and special characters in their names (regression) - @laurenceisla
+ - #2364, "404 Not Found" on nested routes and "405 Method Not Allowed" errors no longer start an empty database transaction - @steve-chavez
+ - #2342, Fix inaccurate result count when an inner embed was selected after a normal embed in the query string - @laurenceisla
+ - #2376, OPTIONS requests no longer start an empty database transaction - @steve-chavez
+ - #2395, Allow using columns with dollar sign($) without double quoting in filters and `select` - @steve-chavez
+ - #2410, Fix loop crash error on startup in Postgres 15 beta 3. Log: "UNION types \"char\" and text cannot be matched". - @yevon
+ - #2397, Fix race conditions managing database connection helper - @robx
+ - #2269, Allow `limit=0` in the request query to return an empty array - @gautam1168, @laurenceisla
+ - #2401, Ensure database connections can't outlive SIGUSR1 - @robx
+
+### Changed
+
+ - #2001, Return 204 No Content without Content-Type for RPCs returning VOID - @wolfgangwalther
+   + Previously, those RPCs would return "null" as a body with Content-Type: application/json.
+ - #2156, `limit/offset` now limits the affected rows on UPDATE/DELETE  - @steve-chavez
+   + Previously, `limit/offset` only limited the returned rows but not the actual updated rows
+ - #2155, `max-rows` is no longer applied on POST/PATCH/PUT/DELETE returned rows - @steve-chavez
+   + This was misleading because the affected rows were not really affected by `max-rows`, only the returned rows were limited
+ - #2070, Restrict generated many-to-many relationships - @steve-chavez
+   + A primary key that contains the foreign key columns is now needed for generating many-to-many relationships.
+ - #2277, Views now are not detected when embedding using the column or FK as target (`/view?select=*,column(*)`) - @steve-chavez
+   + This embedding form was easily made ambiguous whenever a new view was added.
+   + You can use computed relationships to keep this embedding form working
+ - #2312, Using `Prefer: return=representation` no longer returns a `Location` header - @laurenceisla
+ - #1984, For the cases where one to one relationships are detected, json objects will be returned instead of json arrays of length 1
+   + If you wish to override this behavior, you can use computed relationships to return arrays again
+   + You can get the newly detected one-to-one relationships by using the `--dump-schema` option and filtering with [jq](https://github.com/jqlang/jq).
+     ```
+     ./postgrest --dump-schema  \
+     | jq  '[.dbRelationships | .[] | .[1] | .[] | select(.relCardinality.tag == "O2O" and .relFTableIsView == false and .relTableIsView == false) | del(.relFTableIsView,.relTableIsView,.tag,.relIsSelf)]'
+     ```
+
+## [9.0.1] - 2022-06-03
+
+### Fixed
+
+- #2165, Fix json/jsonb columns should not have type in OpenAPI spec - @clrnd
+- #2020, Execute deferred constraint triggers when using `Prefer: tx=rollback` - @wolfgangwalther
+- #2077, Fix `is` not working with upper or mixed case values like `NULL, TrUe, FaLsE` - @steve-chavez
+- #2024, Fix schema cache loading when views with XMLTABLE and DEFAULT are present - @wolfgangwalther
+- #1724, Fix wrong CORS header Authentication -> Authorization - @wolfgangwalther
+- #2120, Fix reading database configuration properly when `=` is present in value - @wolfgangwalther
+- #2135, Remove trigger functions from schema cache and OpenAPI output, because they can't be called directly anyway. - @wolfgangwalther
+- #2101, Remove aggregates, procedures and window functions from the schema cache and OpenAPI output. - @wolfgangwalther
+- #2153, Fix --dump-schema running with a wrong PG version. - @wolfgangwalther
+- #2042, Keep working when EMFILE(Too many open files) is reached. - @steve-chavez
+- #2147, Ignore `Content-Type` headers for `GET` requests when calling RPCs. - @laurenceisla
+    + Previously, `GET` without parameters, but with `Content-Type: text/plain` or `Content-Type: application/octet-stream` would fail with `404 Not Found`, even if a function without arguments was available.
+- #2239, Fix misleading disambiguation error where the content of the `relationship` key looks like valid syntax - @laurenceisla
+- #2294, Disable parallel GC for better performance on higher core CPUs - @steve-chavez
+- #1076, Fix using CPU while idle - @steve-chavez
+
+## [9.0.0] - 2021-11-25
+
+### Added
+
+ - #1783, Include partitioned tables into the schema cache. Allows embedding, UPSERT, INSERT with Location response, OPTIONS request and OpenAPI support for partitioned tables - @laurenceisla
+ - #1878, Add Retry-After hint header when in recovery mode - @gautam1168
+ - #1735, Allow calling function with single unnamed param through RPC POST. - @steve-chavez
+   + Enables calling a function with a single json parameter without using `Prefer: params=single-object`
+   + Enables uploading bytea to a function with `Content-Type: application/octet-stream`
+   + Enables uploading raw text to a function with `Content-Type: text/plain`
+ - #1938, Allow escaping inside double quotes with a backslash, e.g. `?col=in.("Double\"Quote")`, `?col=in.("Back\\slash")` - @steve-chavez
+ - #1075, Allow filtering top-level resource based on embedded resources filters. This is enabled by adding `!inner` to the embedded resource, e.g. `/projects?select=*,clients!inner(*)&clients.id=eq.12`- @steve-chavez, @Iced-Sun
+ - #1857, Make GUC names for headers, cookies and jwt claims compatible with PostgreSQL v14 - @laurenceisla, @robertsosinski
+   + Getting the value for a header GUC on PostgreSQL 14 is done using `current_setting('request.headers')::json->>'name-of-header'` and in a similar way for `request.cookies` and `request.jwt.claims`
+   + PostgreSQL versions below 14 can opt in to the new JSON GUCs by setting the `db-use-legacy-gucs` config option to false (true by default)
+ - #1988, Allow specifying `unknown` for the `is` operator - @steve-chavez
+ - #2031, Improve error message for ambiguous embedding and add a relevant hint that includes unambiguous embedding suggestions - @laurenceisla
+
+### Fixed
+
+ - #1871, Fix OpenAPI missing default values for String types and identify Array types as "array" instead of "string" - @laurenceisla
+ - #1930, Fix RPC return type handling for `RETURNS TABLE` with a single column. Regression of #1615. - @wolfgangwalther
+ - #1938, Fix using single double quotes(`"`) and backslashes(`/`) as values on the "in" operator - @steve-chavez
+ - #1992, Fix schema cache query failing with standard_conforming_strings = off - @wolfgangwalther
+
+### Changed
+
+ - #1949, Drop support for embedding hints used with '.'(`select=projects.client_id(*)`), '!' should be used instead(`select=projects!client_id(*)`) - @steve-chavez
+ - #1783, Partitions (created using `PARTITION OF`) are no longer included in the schema cache. - @laurenceisla
+ - #2038, Dropped support for PostgreSQL 9.5 - @wolfgangwalther
 
 ## [8.0.0] - 2021-07-25
 

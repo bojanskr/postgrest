@@ -1,0 +1,53 @@
+name: Docs
+
+on:
+  workflow_call:
+    secrets:
+      CACHIX_AUTH_TOKEN:
+        required: false
+  pull_request:
+    branches:
+      - main
+      - v[0-9]+
+    paths:
+      - .github/workflows/docs.yaml
+      - .github/actions/setup-nix/**
+      - default.nix
+      - nix/**
+      - docs/**
+      - '!**.md'
+
+concurrency:
+  # Terminate all previous runs of the same workflow for pull requests
+  group: docs-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup Nix Environment
+      uses: ./.github/actions/setup-nix
+      with:
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        tools: docs.build.bin
+    - run: postgrest-docs-build
+    - run: git diff --exit-code HEAD locales || echo "Please commit changes to the locales/ folder after running postgrest-docs-build."
+
+
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup Nix Environment
+      uses: ./.github/actions/setup-nix
+      with:
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        tools: docs.spellcheck.bin docs.dictcheck.bin
+    - name: Run spellcheck
+      run: postgrest-docs-spellcheck
+    - name: Run dictcheck
+      run: postgrest-docs-dictcheck

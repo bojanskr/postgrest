@@ -10,6 +10,9 @@ module PostgREST.RangeQuery (
 , restrictRange
 , rangeGeq
 , allRange
+, limitZeroRange
+, hasLimitZero
+, convertToLimitZeroRange
 , NonnegRange
 , rangeStatusHeader
 , contentRangeH
@@ -26,8 +29,7 @@ import Data.Ranged.Ranges
 import Network.HTTP.Types.Header
 import Network.HTTP.Types.Status
 
-import Protolude      hiding (toS)
-import Protolude.Conv (toS)
+import Protolude
 
 type NonnegRange = Range Integer
 
@@ -35,13 +37,14 @@ rangeParse :: BS.ByteString -> NonnegRange
 rangeParse range = do
   let rangeRegex = "^([0-9]+)-([0-9]*)$" :: BS.ByteString
 
-  case listToMaybe (range =~ rangeRegex :: [[BS.ByteString]]) of
-    Just parsedRange ->
-      let [_, mLower, mUpper] = readMaybe . toS <$> parsedRange
-          lower         = maybe emptyRange rangeGeq mLower
-          upper         = maybe allRange rangeLeq mUpper in
+  case range =~ rangeRegex :: [[BS.ByteString]] of
+    [[_, l, u]] ->
+      let lower  = maybe emptyRange rangeGeq (readInteger l)
+          upper  = maybe allRange rangeLeq (readInteger u) in
       rangeIntersection lower upper
-    Nothing -> allRange
+    _ -> allRange
+  where
+    readInteger = readMaybe . BS.unpack
 
 rangeRequested :: RequestHeaders -> NonnegRange
 rangeRequested headers = maybe allRange rangeParse $ lookup hRange headers
@@ -74,6 +77,21 @@ allRange = rangeGeq 0
 rangeLeq :: Integer -> NonnegRange
 rangeLeq n =
   Range BoundaryBelowAll (BoundaryAbove n)
+
+-- Special case to allow limit 0 queries
+-- https://github.com/PostgREST/postgrest/issues/1121
+-- 0 <= x <= -1
+limitZeroRange :: Range Integer
+limitZeroRange = Range (BoundaryBelow 0) (BoundaryAbove (-1))
+
+hasLimitZero :: Range Integer -> Bool
+hasLimitZero r = rangeUpper r == rangeUpper limitZeroRange
+
+-- Used to convert a range into a special limitZeroRange if it has a
+-- limit=0 in order to bypass validations for empty ranges.
+convertToLimitZeroRange :: Range Integer -> Range Integer -> Range Integer
+convertToLimitZeroRange range fallbackRange =
+  if hasLimitZero range then limitZeroRange else fallbackRange
 
 rangeStatusHeader :: NonnegRange -> Int64 -> Maybe Int64 -> (Status, Header)
 rangeStatusHeader topLevelRange queryTotal tableTotal =

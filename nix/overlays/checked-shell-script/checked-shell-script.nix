@@ -2,7 +2,7 @@
 # directly, or use the .bin attribute to get the script in a bin/ directory,
 # to be used in a path for example.
 { argbash
-, bash_5
+, bash
 , coreutils
 , git
 , lib
@@ -14,18 +14,19 @@
 { name
 , docs
 , args ? [ ]
-, addCommandCompletion ? false
-, inRootDir ? false
+, positionalCompletion ? ""
 , redirectTixFiles ? true
 , withEnv ? null
+, withPath ? [ ]
 , withTmpDir ? false
+, workingDir ? null
 }: text:
+assert workingDir == null || lib.hasPrefix "/" workingDir;
 let
+  # square brackets are a pain to escape - if even possible. just don't use them...
+  escape = builtins.replaceStrings [ "\n" ] [ " \\n" ];
+
   argsTemplate =
-    let
-      # square brackets are a pain to escape - if even possible. just don't use them...
-      escapedDocs = builtins.replaceStrings [ "\n" ] [ " \\n" ] docs;
-    in
     writeTextFile {
       inherit name;
       destination = "/${name}.m4"; # destination is needed to have the proper basename for completion
@@ -36,7 +37,7 @@ let
           # stripping the /nix/store/... path for nicer display
           BASH_ARGV0="$(basename "$0")"
 
-          # ARG_HELP([${name}], [${escapedDocs}])
+          # ARG_HELP([${name}], [${escape docs}])
           ${lib.strings.concatMapStrings (arg: "# " + arg) args}
           # ARG_POSITIONAL_DOUBLEDASH()
           # ARG_DEFAULTS_POS()
@@ -58,14 +59,14 @@ let
         sed '/_positionals_count + 1/a\\t\t\t\tset -- "''${@:1:1}" "--" "''${@:2}"' -i $out
       '';
 
-  bashCompletion =
+  bash-completion =
     runCommand "${name}-completion" { } (
       ''
         ${argbash}/bin/argbash --type completion --strip all ${argsTemplate}/${name}.m4 > $out
       ''
 
-      + lib.optionalString addCommandCompletion ''
-        sed 's/COMPREPLY.*compgen -o bashdefault .*$/_command/' -i $out
+      + lib.optionalString (positionalCompletion != "") ''
+        sed 's#COMPREPLY.*compgen -o bashdefault .*$#${escape positionalCompletion}#' -i $out
       ''
     );
 
@@ -77,7 +78,7 @@ let
 
       text =
         ''
-          #!${bash_5}/bin/bash
+          #!${bash}/bin/bash
           source ${argsParser}
           set -euo pipefail
         ''
@@ -89,7 +90,7 @@ let
           trap 'rm -rf $hpctixdir' EXIT
         ''
 
-        + lib.optionalString inRootDir ''
+        + lib.optionalString (workingDir != null) ''
           cd "$(${git}/bin/git rev-parse --show-toplevel)"
 
           if test ! -f postgrest.cabal; then
@@ -97,6 +98,8 @@ let
                      "run this command somewhere in the PostgREST repo."
             exit 1
           fi
+
+          cd "''${PWD}${workingDir}"
         ''
 
         + lib.optionalString withTmpDir ''
@@ -112,6 +115,10 @@ let
         + lib.optionalString (withEnv != null) ''
           env="$(cat ${withEnv})"
           export PATH="$env/bin:$PATH"
+        ''
+
+        + lib.optionalString (lib.length withPath > 0) ''
+          export PATH="${lib.concatMapStrings (p: p + "/bin:") withPath}$PATH"
         ''
 
         + "(${text})"
@@ -134,4 +141,4 @@ let
   script =
     runCommand name { inherit bin name; } "ln -s $bin/bin/$name $out";
 in
-script // { inherit bin bashCompletion; }
+script // { inherit bin bash-completion; }

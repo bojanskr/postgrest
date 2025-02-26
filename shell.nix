@@ -11,18 +11,18 @@
 }:
 let
   postgrest =
-    import ./default.nix;
+    import ./default.nix { };
 
-  pkgs =
-    postgrest.pkgs;
+  inherit (postgrest) pkgs;
 
-  lib =
-    pkgs.lib;
+  inherit (pkgs) lib;
 
   toolboxes =
     [
       postgrest.cabalTools
       postgrest.devTools
+      postgrest.docs
+      postgrest.loadtest
       postgrest.nixpkgsTools
       postgrest.style
       postgrest.tests
@@ -39,20 +39,25 @@ lib.overrideDerivation postgrest.env (
       base.buildInputs ++ [
         pkgs.cabal-install
         pkgs.cabal2nix
+        pkgs.git
         pkgs.postgresql
+        pkgs.update-nix-fetchgit
         postgrest.hsie.bin
       ]
       ++ toolboxes;
 
     shellHook =
       ''
-        source ${pkgs.bashCompletion}/etc/profile.d/bash_completion.sh
-        source ${postgrest.hsie.bashCompletion}
+        export HISTFILE=.history
+
+        source ${pkgs.bash-completion}/etc/profile.d/bash_completion.sh
+        source ${pkgs.git}/share/git/contrib/completion/git-completion.bash
+        source ${postgrest.hsie.bash-completion}
 
       ''
       + builtins.concatStringsSep "\n" (
-        builtins.map (bashCompletion: "source ${bashCompletion}") (
-          builtins.concatLists (builtins.map (toolbox: toolbox.bashCompletion) toolboxes)
+        builtins.map (bash-completion: "source ${bash-completion}") (
+          builtins.concatLists (builtins.map (toolbox: toolbox.bash-completion) toolboxes)
         )
       );
   }

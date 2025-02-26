@@ -23,6 +23,7 @@ import qualified Data.Text                               as T
 import qualified Data.Text.IO                            as T
 import qualified Dot
 import qualified GHC
+import qualified GHC.Paths
 import qualified Language.Haskell.GHC.ExactPrint.Parsers as ExactPrint
 import qualified Options.Applicative                     as O
 import qualified System.FilePath                         as FP
@@ -33,10 +34,12 @@ import Data.List                  (intercalate)
 import Data.Maybe                 (catMaybes, mapMaybe)
 import Data.Text                  (Text)
 import GHC.Generics               (Generic)
-import HsExtension                (GhcPs)
-import Module                     (moduleNameString)
-import OccName                    (occNameString)
-import RdrName                    (rdrNameOcc)
+import GHC.Hs.Extension           (GhcPs)
+import GHC.Types.Error            (getMessages)
+import GHC.Types.Name.Occurrence  (occNameString)
+import GHC.Types.Name.Reader      (rdrNameOcc)
+import GHC.Unit.Module.Name       (moduleNameString)
+import GHC.Utils.Error            (pprMsgEnvelopeBagWithLoc)
 import System.Directory.Recursive (getFilesRecursive)
 import System.Exit                (exitFailure)
 
@@ -195,21 +198,21 @@ sourceSymbols source = do
       return $ concatMap (importSymbols source filepath . GHC.unLoc) hsmodImports
 
 -- | Parse a Haskell module
-parseModule :: String -> IO (GHC.HsModule GhcPs)
+parseModule :: FilePath -> IO GHC.HsModule
 parseModule filepath = do
-  result <- ExactPrint.parseModule filepath
+  result <- ExactPrint.parseModule GHC.Paths.libdir filepath
   case result of
-    Right (_, hsmod) ->
+    Right hsmod ->
       return $ GHC.unLoc hsmod
-    Left (loc, err) ->
-      fail $ "Error with " <> show filepath <> " at " <> show loc <> ": " <> err
+    Left errs ->
+      fail $ "Errors with " <> show filepath <> ":\n    "
+        <> show (pprMsgEnvelopeBagWithLoc $ getMessages errs)
 
 -- | Symbols imported in an import declaration.
 --
 -- If the import is a wildcard, i.e. no symbols are selected for import, then
 -- only one item is returned.
 importSymbols :: FilePath -> FilePath -> GHC.ImportDecl GhcPs -> [ImportedSymbol]
-importSymbols _ _  (GHC.XImportDecl _) = mempty
 importSymbols source filepath GHC.ImportDecl{..} =
   case ideclHiding of
     Just (hiding, syms) ->
@@ -223,7 +226,7 @@ importSymbols source filepath GHC.ImportDecl{..} =
         , impSource = source
         , impFromModule = T.pack $ moduleFromPath filepath
         , impModule = T.pack . moduleNameString . GHC.unLoc $ ideclName
-        , impQualified = if ideclQualified then Qualified else NotQualified
+        , impQualified = if ideclQualified /= GHC.NotQualified then Qualified else NotQualified
         , impAlias = T.pack . moduleNameString . GHC.unLoc <$> ideclAs
         , impInternal = External
         , impType = hiding
@@ -247,8 +250,7 @@ dump OutputJson = encodePretty
 -- | Find modules that are imported under different aliases
 inconsistentAliases :: [ImportedSymbol] -> ModuleAliases
 inconsistentAliases symbols =
-  fmap moduleAlias symbols
-    & foldr insertSetMapMap Map.empty
+  foldr (insertSetMapMap . moduleAlias) Map.empty symbols
     & Map.map (aliases . Map.toList)
     & Map.filter ((<) 1 . length)
     & Map.toList

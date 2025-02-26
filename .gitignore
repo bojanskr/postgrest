@@ -21,3 +21,6 @@ __pycache__
 *.tix
 coverage
 .hpc
+loadtest
+.history
+.docs-build
